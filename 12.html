@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEON NAVIGATOR | 赛博朋克导航中枢</title>
+    <style>
+        :root {
+            --neon-green: #39FF14;
+            --electric-blue: #0FF;
+            --hot-pink: #FF0D7E;
+            --dark-bg: #0a0a2a;
+            --grid-line: rgba(0, 255, 255, 0.1);
+            --font-main: 'Rajdhani', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-main);
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: white;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 数字雨背景 */
+        .matrix-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        .matrix-char {
+            position: absolute;
+            color: var(--electric-blue);
+            font-size: 16px;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(100vh); }
+        }
+
+        /* 顶部状态栏 */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid var(--grid-line);
+        }
+
+        .system-info {
+            display: flex;
+            gap: 20px;
+        }
+
+        .cpu-usage::before {
+            content: "&#9203; CPU: 12%";
+        }
+
+        .mem-usage::before {
+            content: "&#128190; RAM: 45%";
+        }
+
+        /* 中央LOGO区 */
+        .logo-container {
+            text-align: center;
+            margin: 40px auto;
+            position: relative;
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-blue));
+            margin: 0 auto 20px;
+            position: relative;
+            box-shadow: 0 0 20px var(--neon-green);
+            animation: pulse 2s infinite alternate;
+        }
+
+        .avatar::after {
+            content: "";
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, transparent, var(--electric-blue) 70%);
+            z-index: -1;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 10px var(--neon-green); }
+            100% { box-shadow: 0 0 30px var(--neon-green), 0 0 50px var(--electric-blue); }
+        }
+
+        .username {
+            font-size: 24px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-green);
+        }
+
+        /* 六边形导航网格 */
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .hexagon {
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--grid-line);
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hexagon:hover {
+            transform: scale(1.05);
+            background: rgba(0, 0, 0, 0.7);
+            box-shadow: 0 0 15px var(--electric-blue);
+        }
+
+        .hexagon::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                transparent 45%,
+                var(--electric-blue) 50%,
+                transparent 55%
+            );
+            transform: rotate(45deg);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .hexagon:hover::before {
+            opacity: 0.3;
+        }
+
+        .hexagon i {
+            font-size: 36px;
+            margin-bottom: 15px;
+            color: var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-green);
+        }
+
+        .hexagon span {
+            font-size: 16px;
+            letter-spacing: 1px;
+            color: white;
+        }
+
+        /* 底部Dock栏 */
+        .dock {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            border-top: 1px solid var(--grid-line);
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .dock-item {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--grid-line);
+        }
+
+        .dock-item:hover {
+            transform: translateY(-10px);
+            background: rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 15px var(--electric-blue);
+        }
+
+        .dock-item i {
+            font-size: 24px;
+            color: var(--neon-green);
+        }
+
+        /* 分类标签页 */
+        .tab-content {
+            display: none;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .site-card {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--grid-line);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .site-card:hover {
+            background: rgba(0, 0, 0, 0.7);
+            box-shadow: 0 0 15px var(--electric-blue);
+        }
+
+        .site-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: black;
+            font-weight: bold;
+        }
+
+        .site-info {
+            flex: 1;
+        }
+
+        .site-name {
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: var(--neon-green);
+        }
+
+        .site-url {
+            font-size: 14px;
+            color: var(--electric-blue);
+            word-break: break-all;
+        }
+
+        /* 搜索框 */
+        .search-container {
+            max-width: 600px;
+            margin: 30px auto;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--grid-line);
+            border-radius: 30px;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            background: rgba(0, 0, 0, 0.7);
+            border-color: var(--electric-blue);
+            box-shadow: 0 0 15px var(--electric-blue);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--neon-green);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            color: black;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background: var(--electric-blue);
+            box-shadow: 0 0 15px var(--electric-blue);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .hexagon {
+                padding: 20px 10px;
+            }
+            
+            .dock {
+                flex-wrap: wrap;
+                justify-content: flex-start;
+                padding: 10px;
+            }
+            
+            .dock-item {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        /* 字体图标 */
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
+    </style>
+</head>
+<body>
+    <!-- 数字雨背景 -->
+    <div class="matrix-rain" id="matrixRain"></div>
+
+    <!-- 顶部状态栏 -->
+    <div class="status-bar">
+        <div class="time" id="currentTime">2025/06/15 14:30:45</div>
+        <div class="system-info">
+            <div class="cpu-usage"></div>
+            <div class="mem-usage"></div>
+        </div>
+    </div>
+
+    <!-- 中央LOGO区 -->
+    <div class="logo-container">
+        <div class="avatar"></div>
+        <h1 class="username">CYBER NAVIGATOR</h1>
+    </div>
+
+    <!-- 搜索框 -->
+    <div class="search-container">
+        <input type="text" class="search-input" placeholder="输入关键词搜索...">
+        <button class="search-btn"><i class="fas fa-search"></i></button>
+    </div>
+
+    <!-- 六边形主导航 -->
+    <div class="nav-grid">
+        <div class="hexagon" onclick="showTab('workbench')">
+            <i class="fas fa-tools"></i>
+            <span>工作台</span>
+        </div>
+        <div class="hexagon" onclick="showTab('entertainment')">
+            <i class="fas fa-gamepad"></i>
+            <span>娱乐中枢</span>
+        </div>
+        <div class="hexagon" onclick="showTab('knowledge')">
+            <i class="fas fa-book"></i>
+            <span>知识库</span>
+        </div>
+        <div class="hexagon" onclick="showTab('system')">
+            <i class="fas fa-cog"></i>
+            <span>系统控制</span>
+        </div>
+        <div class="hexagon" onclick="showTab('custom')">
+            <i class="fas fa-star"></i>
+            <span>自定义</span>
+        </div>
+    </div>
+
+    <!-- 分类内容区 -->
+    <div class="tab-content active" id="workbench">
+        <h2 style="color: var(--neon-green); margin-bottom: 20px;">工作台工具集</h2>
+        <div class="site-card">
+            <div class="site-icon">N</div>
+            <div class="site-info">
+                <div class="site-name">Notion</div>
+                <div class="site-url">https://www.notion.so</div>
+            </div>
+        </div>
+        <div class="site-card">
+            <div class="site-icon">F</div>
+            <div class="site-info">
+                <div class="site-name">Figma</div>
+                <div class="site-url">https://www.figma.com</div>
+            </div>
+        </div>
+        <div class="site-card">
+            <div class="site-icon">V</div>
+            <div class="site-info">
+                <div class="site-name">VS Code</div>
+                <div class="site-url">https://code.visualstudio.com</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-content" id="entertainment">
+        <h2 style="color: var(--neon-green); margin-bottom: 20px;">娱乐中枢</h2>
+        <div class="site-card">
+            <div class="site-icon">S</div>
+            <div class="site-info">
+                <div class="site-name">Steam</div>
+                <div class="site-url">https://store.steampowered.com</div>
+            </div>
+        </div>
+        <div class="site-card">
+            <div class="site-icon">M</div>
+            <div class="site-info">
+                <div class="site-name">Netflix</div>
+                <div class="site-url">https://www.netflix.com</div>
+            </div>
+        </div>
+        <div class="site-card">
+            <div class="site-icon">P</div>
+            <div class="site-info">
+                <div class="site-name">Spotify</div>
+                <div class="site-url">https://www.spotify.com</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-content" id="knowledge">
+        <h2 style="color: var(--neon-green); margin-bottom: 20px;">知识宝库</h2>
+        <div class="site-card">
+            <div class="site-icon">Z</div>
+            <div class="site-info">
+                <div class="site-name">Z-Library</div>
+                <div class="site-url">https://zh.z-lib.org</div>
+            </div>
+        </div>
+        <div class="site-card">
+            <div class="site-icon">A</div>
+            <div class="site-info">
+                <div class="site-name">ArXiv</div>
+                <div class="site-url">https://arxiv.org</div>
+            </div>
+        </div>
+        <div class="site-card">
+            <div class="site-icon">C</div>
+            <div class="site-info">
+                <div class="site-name">Coursera</div>
+                <div class="site-url">https://www.coursera.org</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-content" id="system">
+        <h2 style="color: var(--neon-green); margin-bottom: 20px;">系统控制台</h2>
+        <div class="site-card">
+            <div class="site-icon">R</div>
+            <div class="site-info">
+                <div class="site-name">路由器设置</div>
+                <div class="site-url">http://192.168.1.1</div>
+            </div>
+        </div>
+        <div class="site-card">
+            <div class="site-icon">N</div>
+            <div class="site-info">
+                <div class="site-name">NAS管理</div>
+                <div class="site-url">http://mynas.local</div>
+            </div>
+        </div>
+        <div class="site-card">
+            <div class="site-icon">H</div>
+            <div class="site-info">
+                <div class="site-name">智能家居</div>
+                <div class="site-url">http://homeassistant.local</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-content" id="custom">
+        <h2 style="color: var(--neon-green); margin-bottom: 20px;">自定义链接</h2>
+        <div class="site-card">
+            <div class="site-icon">G</div>
+            <div class="site-info">
+                <div class="site-name">GitHub</div>
+                <div class="site-url">https://github.com</div>
+            </div>
+        </div>
+        <div class="site-card">
+            <div class="site-icon">L</div>
+            <div class="site-info">
+                <div class="site-name">LeetCode</div>
+                <div class="site-url">https://leetcode.com</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部Dock栏 -->
+    <div class="dock">
+        <div class="dock-item" onclick="window.open('https://www.google.com')">
+            <i class="fab fa-chrome"></i>
+        </div>
+        <div class="dock-item" onclick="window.open('https://mail.google.com')">
+            <i class="fas fa-envelope"></i>
+        </div>
+        <div class="dock-item" onclick="window.open('https://calendar.google.com')">
+            <i class="fas fa-calendar"></i>
+        </div>
+        <div class="dock-item" onclick="window.open('https://drive.google.com')">
+            <i class="fas fa-cloud"></i>
+        </div>
+        <div class="dock-item" onclick="window.open('https://music.youtube.com')">
+            <i class="fab fa-youtube"></i>
+        </div>
+    </div>
+
+    <script>
+        // 数字雨效果
+        function createMatrixRain() {
+            const container = document.getElementById('matrixRain');
+            const chars = "01";
+            
+            setInterval(() => {
+                const char = document.createElement('div');
+                char.className = 'matrix-char';
+                char.innerText = chars[Math.floor(Math.random() * chars.length)];
+                char.style.left = Math.random() * 100 + 'vw';
+                char.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                container.appendChild(char);
+                
+                setTimeout(() => {
+                    char.remove();
+                }, parseFloat(char.style.animationDuration) * 1000);
+            }, 300);
+        }
+
+        // 显示对应分类标签页
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // 更新时间显示
+        function updateTime() {
+            const now = new Date();
+            const timeStr = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+            document.getElementById('currentTime').textContent = timeStr;
+        }
+
+        // 初始化
+        window.onload = function() {
+            createMatrixRain();
+            updateTime();
+            setInterval(updateTime, 1000);
+            
+            // 为所有站点卡片添加点击事件
+            document.querySelectorAll('.site-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const url = this.querySelector('.site-url').textContent;
+                    window.open(url, '_blank');
+                });
+            });
+        };
+    </script>
+</body>
+</html>
