@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEON NAVIGATOR | 赛博朋克网络中枢</title>
+    <title>Cyberpunk Hub | 赛博朋克导航中枢</title>
     <style>
         :root {
             --neon-green: #39FF14;
@@ -183,54 +183,25 @@
             color: white;
         }
 
-        /* 底部Dock栏 */
-        .dock {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
-            border-top: 1px solid var(--grid-line);
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-        }
-
-        .dock-item {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid var(--grid-line);
-        }
-
-        .dock-item:hover {
-            transform: translateY(-10px);
-            background: rgba(0, 255, 255, 0.2);
-            box-shadow: 0 0 15px var(--electric-blue);
-        }
-
-        .dock-item i {
-            font-size: 24px;
-            color: var(--neon-green);
-        }
-
         /* 分类标签页 */
         .tab-content {
             display: none;
             max-width: 1200px;
             margin: 40px auto;
             padding: 0 20px;
+            padding-bottom: 70px; /* 增加底部内边距，避免内容被版权声明遮挡 */
         }
 
         .tab-content.active {
             display: block;
+        }
+
+        /* 修改站点卡片布局为网格 */
+        .site-cards-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            width: 100%;
         }
 
         .site-card {
@@ -238,44 +209,68 @@
             border: 1px solid var(--grid-line);
             border-radius: 8px;
             padding: 15px;
-            margin-bottom: 15px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             transition: all 0.3s ease;
+            cursor: pointer;
+            width: 200px; /* 固定宽度 */
+            height: 160px; /* 增加高度以容纳网址 */
+            box-sizing: border-box;
         }
 
         .site-card:hover {
             background: rgba(0, 0, 0, 0.7);
             box-shadow: 0 0 15px var(--electric-blue);
+            transform: translateY(-5px);
         }
 
         .site-icon {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             background: var(--neon-green);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 15px;
+            margin-bottom: 10px;
             color: black;
             font-weight: bold;
+            font-size: 20px;
+            flex-shrink: 0;
         }
 
         .site-info {
+            text-align: center;
+            width: 100%;
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .site-name {
-            font-size: 18px;
+            font-size: 16px;
             margin-bottom: 5px;
             color: var(--neon-green);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
         }
 
         .site-url {
-            font-size: 14px;
+            font-size: 11px; /* 稍微减小字体大小 */
             color: var(--electric-blue);
             word-break: break-all;
+            display: block; /* 显示网址 */
+            margin-top: 5px;
+            max-height: 40px; /* 限制最大高度 */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* 最多显示2行 */
+            -webkit-box-orient: vertical;
         }
 
         /* 搜索框 */
@@ -324,7 +319,68 @@
             box-shadow: 0 0 15px var(--electric-blue);
         }
 
+        /* 版权声明 */
+        .footer {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            border-top: 1px solid var(--grid-line);
+            padding: 15px 0;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 10;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .footer-text {
+            color: var(--electric-blue);
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .footer-link {
+            color: var(--neon-green);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--electric-blue);
+            text-shadow: 0 0 5px var(--electric-blue);
+        }
+
         /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .site-cards-container {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .site-cards-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .site-cards-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 400px) {
+            .site-cards-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media (max-width: 768px) {
             .nav-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -334,15 +390,9 @@
                 padding: 20px 10px;
             }
             
-            .dock {
-                flex-wrap: wrap;
-                justify-content: flex-start;
-                padding: 10px;
-            }
-            
-            .dock-item {
-                width: 40px;
-                height: 40px;
+            .footer-content {
+                flex-direction: column;
+                gap: 10px;
             }
         }
 
@@ -366,174 +416,240 @@
     <!-- 中央LOGO区 -->
     <div class="logo-container">
         <div class="avatar"></div>
-        <h1 class="username">CYBER NAVIGATOR</h1>
+        <h1 class="username">Cyberpunk Hub</h1>
     </div>
 
     <!-- 搜索框 -->
     <div class="search-container">
-        <input type="text" class="search-input" placeholder="输入关键词搜索...">
-        <button class="search-btn"><i class="fas fa-search"></i></button>
+        <input type="text" class="search-input" id="searchInput" placeholder="输入关键词搜索...">
+        <button class="search-btn" id="searchBtn"><i class="fas fa-search"></i></button>
     </div>
 
     <!-- 六边形主导航 -->
     <div class="nav-grid">
         <div class="hexagon" onclick="showTab('workbench')">
             <i class="fas fa-tools"></i>
-            <span>工作台</span>
+            <span>个人网站</span>
         </div>
         <div class="hexagon" onclick="showTab('entertainment')">
             <i class="fas fa-gamepad"></i>
-            <span>娱乐中枢</span>
+            <span>特色论坛</span>
         </div>
         <div class="hexagon" onclick="showTab('knowledge')">
             <i class="fas fa-book"></i>
-            <span>知识库</span>
+            <span>网址导航</span>
         </div>
         <div class="hexagon" onclick="showTab('system')">
             <i class="fas fa-cog"></i>
-            <span>系统控制</span>
+            <span>网络资源</span>
         </div>
         <div class="hexagon" onclick="showTab('custom')">
             <i class="fas fa-star"></i>
-            <span>自定义</span>
+            <span>知识宝库</span>
         </div>
     </div>
 
     <!-- 分类内容区 -->
     <div class="tab-content active" id="workbench">
-        <h2 style="color: var(--neon-green); margin-bottom: 20px;">工作台工具集</h2>
-        <div class="site-card">
-            <div class="site-icon">N</div>
-            <div class="site-info">
-                <div class="site-name">Notion</div>
-                <div class="site-url">https://www.notion.so</div>
+        <h2 style="color: var(--neon-green); margin-bottom: 20px;">个人网站</h2>
+        <div class="site-cards-container">
+            <div class="site-card">
+                <div class="site-icon">N</div>
+                <div class="site-info">
+                    <div class="site-name">Notion</div>
+                    <div class="site-url">https://www.notion.so</div>
+                </div>
             </div>
-        </div>
-        <div class="site-card">
-            <div class="site-icon">F</div>
-            <div class="site-info">
-                <div class="site-name">Figma</div>
-                <div class="site-url">https://www.figma.com</div>
+            <div class="site-card">
+                <div class="site-icon">N</div>
+                <div class="site-info">
+                    <div class="site-name">Notion</div>
+                    <div class="site-url">https://www.notion.so</div>
+                </div>
             </div>
-        </div>
-        <div class="site-card">
-            <div class="site-icon">V</div>
-            <div class="site-info">
-                <div class="site-name">VS Code</div>
-                <div class="site-url">https://code.visualstudio.com</div>
+            <div class="site-card">
+                <div class="site-icon">N</div>
+                <div class="site-info">
+                    <div class="site-name">Notion</div>
+                    <div class="site-url">https://www.notion.so</div>
+                </div>
+            </div>
+            <div class="site-card">
+                <div class="site-icon">N</div>
+                <div class="site-info">
+                    <div class="site-name">Notion</div>
+                    <div class="site-url">https://www.notion.so</div>
+                </div>
+            </div>
+            <div class="site-card">
+                <div class="site-icon">N</div>
+                <div class="site-info">
+                    <div class="site-name">Notion</div>
+                    <div class="site-url">https://www.notion.so</div>
+                </div>
+            </div>
+            <div class="site-card">
+                <div class="site-icon">N</div>
+                <div class="site-info">
+                    <div class="site-name">Notion</div>
+                    <div class="site-url">https://www.notion.so</div>
+                </div>
+            </div>
+            <div class="site-card">
+                <div class="site-icon">N</div>
+                <div class="site-info">
+                    <div class="site-name">Notion</div>
+                    <div class="site-url">https://www.notion.so</div>
+                </div>
+            </div>
+            <div class="site-card">
+                <div class="site-icon">N</div>
+                <div class="site-info">
+                    <div class="site-name">Notion</div>
+                    <div class="site-url">https://www.notion.so</div>
+                </div>
+            </div>
+            <div class="site-card">
+                <div class="site-icon">N</div>
+                <div class="site-info">
+                    <div class="site-name">Notion</div>
+                    <div class="site-url">https://www.notion.so</div>
+                </div>
+            </div>
+            <div class="site-card">
+                <div class="site-icon">N</div>
+                <div class="site-info">
+                    <div class="site-name">Notion</div>
+                    <div class="site-url">https://www.notion.so</div>
+                </div>
+            </div>
+            <div class="site-card">
+                <div class="site-icon">F</div>
+                <div class="site-info">
+                    <div class="site-name">Figma</div>
+                    <div class="site-url">https://www.figma.com</div>
+                </div>
+            </div>
+            <div class="site-card">
+                <div class="site-icon">V</div>
+                <div class="site-info">
+                    <div class="site-name">VS Code</div>
+                    <div class="site-url">https://code.visualstudio.com</div>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="tab-content" id="entertainment">
-        <h2 style="color: var(--neon-green); margin-bottom: 20px;">娱乐中枢</h2>
-        <div class="site-card">
-            <div class="site-icon">S</div>
-            <div class="site-info">
-                <div class="site-name">Steam</div>
-                <div class="site-url">https://store.steampowered.com</div>
+        <h2 style="color: var(--neon-green); margin-bottom: 20px;">特色论坛</h2>
+        <div class="site-cards-container">
+            <div class="site-card">
+                <div class="site-icon">S</div>
+                <div class="site-info">
+                    <div class="site-name">Steam</div>
+                    <div class="site-url">https://store.steampowered.com</div>
+                </div>
             </div>
-        </div>
-        <div class="site-card">
-            <div class="site-icon">M</div>
-            <div class="site-info">
-                <div class="site-name">Netflix</div>
-                <div class="site-url">https://www.netflix.com</div>
+            <div class="site-card">
+                <div class="site-icon">M</div>
+                <div class="site-info">
+                    <div class="site-name">Netflix</div>
+                    <div class="site-url">https://www.netflix.com</div>
+                </div>
             </div>
-        </div>
-        <div class="site-card">
-            <div class="site-icon">P</div>
-            <div class="site-info">
-                <div class="site-name">Spotify</div>
-                <div class="site-url">https://www.spotify.com</div>
+            <div class="site-card">
+                <div class="site-icon">P</div>
+                <div class="site-info">
+                    <div class="site-name">Spotify</div>
+                    <div class="site-url">https://www.spotify.com</div>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="tab-content" id="knowledge">
-        <h2 style="color: var(--neon-green); margin-bottom: 20px;">知识宝库</h2>
-        <div class="site-card">
-            <div class="site-icon">Z</div>
-            <div class="site-info">
-                <div class="site-name">Z-Library</div>
-                <div class="site-url">https://zh.z-lib.org</div>
+        <h2 style="color: var(--neon-green); margin-bottom: 20px;">网址导航</h2>
+        <div class="site-cards-container">
+            <div class="site-card">
+                <div class="site-icon">Z</div>
+                <div class="site-info">
+                    <div class="site-name">Z-Library</div>
+                    <div class="site-url">https://zh.z-lib.org</div>
+                </div>
             </div>
-        </div>
-        <div class="site-card">
-            <div class="site-icon">A</div>
-            <div class="site-info">
-                <div class="site-name">ArXiv</div>
-                <div class="site-url">https://arxiv.org</div>
+            <div class="site-card">
+                <div class="site-icon">A</div>
+                <div class="site-info">
+                    <div class="site-name">ArXiv</div>
+                    <div class="site-url">https://arxiv.org</div>
+                </div>
             </div>
-        </div>
-        <div class="site-card">
-            <div class="site-icon">C</div>
-            <div class="site-info">
-                <div class="site-name">Coursera</div>
-                <div class="site-url">https://www.coursera.org</div>
+            <div class="site-card">
+                <div class="site-icon">C</div>
+                <div class="site-info">
+                    <div class="site-name">Coursera</div>
+                    <div class="site-url">https://www.coursera.org</div>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="tab-content" id="system">
-        <h2 style="color: var(--neon-green); margin-bottom: 20px;">系统控制台</h2>
-        <div class="site-card">
-            <div class="site-icon">R</div>
-            <div class="site-info">
-                <div class="site-name">路由器设置</div>
-                <div class="site-url">http://192.168.1.1</div>
+        <h2 style="color: var(--neon-green); margin-bottom: 20px;">网络资源</h2>
+        <div class="site-cards-container">
+            <div class="site-card">
+                <div class="site-icon">R</div>
+                <div class="site-info">
+                    <div class="site-name">路由器设置</div>
+                    <div class="site-url">http://192.168.1.1</div>
+                </div>
             </div>
-        </div>
-        <div class="site-card">
-            <div class="site-icon">N</div>
-            <div class="site-info">
-                <div class="site-name">NAS管理</div>
-                <div class="site-url">http://mynas.local</div>
+            <div class="site-card">
+                <div class="site-icon">N</div>
+                <div class="site-info">
+                    <div class="site-name">NAS管理</div>
+                    <div class="site-url">http://mynas.local</div>
+                </div>
             </div>
-        </div>
-        <div class="site-card">
-            <div class="site-icon">H</div>
-            <div class="site-info">
-                <div class="site-name">智能家居</div>
-                <div class="site-url">http://homeassistant.local</div>
+            <div class="site-card">
+                <div class="site-icon">H</div>
+                <div class="site-info">
+                    <div class="site-name">智能家居</div>
+                    <div class="site-url">http://homeassistant.local</div>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="tab-content" id="custom">
-        <h2 style="color: var(--neon-green); margin-bottom: 20px;">自定义链接</h2>
-        <div class="site-card">
-            <div class="site-icon">G</div>
-            <div class="site-info">
-                <div class="site-name">GitHub</div>
-                <div class="site-url">https://github.com</div>
+        <h2 style="color: var(--neon-green); margin-bottom: 20px;">知识宝库</h2>
+        <div class="site-cards-container">
+            <div class="site-card">
+                <div class="site-icon">G</div>
+                <div class="site-info">
+                    <div class="site-name">GitHub</div>
+                    <div class="site-url">https://github.com</div>
+                </div>
             </div>
-        </div>
-        <div class="site-card">
-            <div class="site-icon">L</div>
-            <div class="site-info">
-                <div class="site-name">LeetCode</div>
-                <div class="site-url">https://leetcode.com</div>
+            <div class="site-card">
+                <div class="site-icon">L</div>
+                <div class="site-info">
+                    <div class="site-name">LeetCode</div>
+                    <div class="site-url">https://leetcode.com</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- 底部Dock栏 -->
-    <div class="dock">
-        <div class="dock-item" onclick="window.open('https://www.google.com')">
-            <i class="fab fa-chrome"></i>
-        </div>
-        <div class="dock-item" onclick="window.open('https://mail.google.com')">
-            <i class="fas fa-envelope"></i>
-        </div>
-        <div class="dock-item" onclick="window.open('https://calendar.google.com')">
-            <i class="fas fa-calendar"></i>
-        </div>
-        <div class="dock-item" onclick="window.open('https://drive.google.com')">
-            <i class="fas fa-cloud"></i>
-        </div>
-        <div class="dock-item" onclick="window.open('https://music.youtube.com')">
-            <i class="fab fa-youtube"></i>
+    <!-- 版权声明 -->
+    <div class="footer">
+        <div class="footer-content">
+            <div class="footer-text">© 2025 Cyberpunk Hub | 赛博朋克导航中枢</div>
+            <div class="footer-text">
+                <a href="#" class="footer-link" onclick="showAbout(); return false;">关于我们</a> | 
+                <a href="#" class="footer-link" onclick="showPrivacy(); return false;">隐私政策</a> | 
+                <a href="#" class="footer-link" onclick="showTerms(); return false;">使用条款</a>
+            </div>
         </div>
     </div>
 
@@ -572,11 +688,48 @@
             document.getElementById('currentTime').textContent = timeStr;
         }
 
+        // 搜索功能
+        function performSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const query = searchInput.value.trim();
+            
+            if (query) {
+                // 使用Google搜索
+                const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+                window.open(searchUrl, '_blank');
+            }
+        }
+
+        // 显示关于我们弹窗
+        function showAbout() {
+            alert('Cyberpunk Hub 是一个赛博朋克风格的导航网站，旨在为用户提供便捷的网络资源访问体验。\n\n版本：v1.0.0\n最后更新：2025年10月');
+        }
+
+        // 显示隐私政策弹窗
+        function showPrivacy() {
+            alert('隐私政策\n\n我们重视您的隐私。本网站不收集任何个人信息，所有数据仅存储在您的本地设备上。\n\n我们不会与第三方分享您的任何信息。');
+        }
+
+        // 显示使用条款弹窗
+        function showTerms() {
+            alert('使用条款\n\n使用本网站即表示您同意以下条款：\n\n1. 本网站仅供个人使用\n2. 请勿用于任何非法活动\n3. 我们保留随时修改服务的权利\n4. 使用风险由用户自行承担');
+        }
+
         // 初始化
         window.onload = function() {
             createMatrixRain();
             updateTime();
             setInterval(updateTime, 1000);
+            
+            // 为搜索按钮添加点击事件
+            document.getElementById('searchBtn').addEventListener('click', performSearch);
+            
+            // 为搜索输入框添加回车事件
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
             
             // 为所有站点卡片添加点击事件
             document.querySelectorAll('.site-card').forEach(card => {
